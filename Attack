@@ -1,0 +1,50 @@
+using UnityEngine;
+using System.Collections;
+
+[RequireComponent(typeof(Health))]
+
+public class Attack : MonoBehaviour
+{
+    [SerializeField] private float _attackRange = 1f;
+    [SerializeField] private float _attackDamage = 10f;
+    [SerializeField] private float _attackCooldown = 1f;
+
+    private float _lastAttackTime = 2f;
+
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.GetComponent<Health>())
+        {
+            StartCoroutine(Attak(other));
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.GetComponent<Health>())
+        {
+            StopCoroutine(Attak(other));
+        }
+    }
+
+    private IEnumerator Attak(Collider2D other)
+    {
+        WaitForSeconds wait = new(_lastAttackTime);
+
+        while (true)
+        {
+
+            Vector2 playerPosition = other.transform.position;
+            float distanceAttak = Vector2.Distance(transform.position, playerPosition);
+
+            if (distanceAttak <= _attackRange && Time.time >= _lastAttackTime + _attackCooldown)
+            {
+                other.GetComponent<Health>().TakeDamage(_attackDamage);
+                _lastAttackTime = Time.time;
+            }
+
+            yield return wait;
+        }
+    }
+}
