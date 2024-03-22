@@ -16,25 +16,18 @@ public class Health : MonoBehaviour
         _currentHealth = _maxHealth;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.GetComponent<HealthPickup>())
-        {
-            Heal(other.gameObject.GetComponent<HealthPickup>().GiveHealth());
-            Destroy(other.gameObject);
-        }
-    }
-
     public void TakeDamage(float attackDamage)
     {
         if (attackDamage <= 0)
             return;
+        if(_currentHealth <= 0)
+            Destroy(gameObject);
 
         _currentHealth -= attackDamage;
         ModifyHealth(_currentHealth);
     }
 
-    private void Heal(float amount)
+    public void Heal(float amount)
     {
         if (amount <= 0)
             return;
