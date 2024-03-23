@@ -3,45 +3,25 @@ using System.Collections;
 
 [RequireComponent(typeof(Health))]
 
-public class Attack : MonoBehaviour
+public class Attack : TriggerAttak
 {
-    [SerializeField] private float _attackRange = 1f;
-    [SerializeField] private float _attackDamage = 10f;
-    [SerializeField] private float _attackCooldown = 1f;
-
-    private float _lastAttackTime = 2f;
-
-
-    private void OnTriggerEnter2D(Collider2D other)
+    private void Update()
     {
-        if (other.GetComponent<Health>())
+        if (_attack == null)
         {
-            StartCoroutine(Attak(other));
+            _attack = StartCoroutine(AttackCoroutine());
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private IEnumerator AttackCoroutine()
     {
-        if (other.GetComponent<Health>())
+        WaitForSeconds wait = new(_attackCooldown);
+
+        while (_charactersInRange.Count > NullIndex)
         {
-            StopCoroutine(Attak(other));
-        }
-    }
-
-    private IEnumerator Attak(Collider2D other)
-    {
-        WaitForSeconds wait = new(_lastAttackTime);
-
-        while (true)
-        {
-
-            Vector2 playerPosition = other.transform.position;
-            float distanceAttak = Vector2.Distance(transform.position, playerPosition);
-
-            if (distanceAttak <= _attackRange && Time.time >= _lastAttackTime + _attackCooldown)
+            foreach (Collider2D character in _charactersInRange)
             {
-                other.GetComponent<Health>().TakeDamage(_attackDamage);
-                _lastAttackTime = Time.time;
+                character.GetComponent<Health>().TakeDamage(_attackDamage);
             }
 
             yield return wait;
